@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -27,7 +28,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int REQUEST_LOCATION = 1;
     Button button;
-    TextView textView;
+    TextView locationText;
+    TextView cityText;
+    TextView descriptionText;
+    TextView temperatureText;
+    TextView humidityText;
+    TextView pressureText;
     LocationManager locationManager;
     String lattitude,longitude;
 
@@ -38,9 +44,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
 
-        textView = (TextView)findViewById(R.id.text_location);
+        button = findViewById(R.id.button_location);
 
-        button = (Button)findViewById(R.id.button_location);
+        cityText = findViewById(R.id.text_city);
+
+        descriptionText = findViewById(R.id.text_description);
+
+        locationText = findViewById(R.id.text_location);
+
+        temperatureText = findViewById(R.id.text_temperature);
+
+        humidityText = findViewById(R.id.text_humidity);
+
+        pressureText = findViewById(R.id.text_pressure);
 
         button.setOnClickListener(this);
 
@@ -87,9 +103,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(latti,longi,1);
                 if(addresses != null && addresses.size() > 0){
-                    Address ADDRESS = addresses.get(0);
-                    String result = ADDRESS.getAddressLine(0) + ", " + ADDRESS.getLocality();
-                    textView.setText("Your current location is"+ " " + result);
+                    final Address ADDRESS = addresses.get(0);
+                    String result = ADDRESS.getLocality() + ", " + ADDRESS.getAdminArea() +", "+ADDRESS.getCountryName();
+                    locationText.setText("Your current location is"+ ":\n " + result);
+
+
+                    Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+                        @Override
+                        public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                            cityText.setText("City: "+ADDRESS.getAdminArea());
+                            descriptionText.setText(weather_description);
+                            temperatureText.setText("Temperature: "+weather_temp);
+                            humidityText.setText("Humidity: "+weather_humid);
+                            pressureText.setText("Pressure: "+weather_pressure);
+                        }
+                    });
+                    asyncTask.execute(lattitude,longitude);
                 }
 
 
@@ -101,9 +130,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(latti,longi,1);
                 if(addresses != null && addresses.size() > 0){
-                    Address ADDRESS = addresses.get(0);
-                    String result = ADDRESS.getAddressLine(0) + ", " + ADDRESS.getLocality();
-                    textView.setText("Your current location is"+ " " + result);
+                    final Address ADDRESS = addresses.get(0);
+                    String result = ADDRESS.getLocality() + ", " + ADDRESS.getAdminArea() +", "+ADDRESS.getCountryName();
+                    locationText.setText("Your current location is"+ ":\n " + result);
+
+                    Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+                        @Override
+                        public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                            cityText.setText("City: "+ADDRESS.getAdminArea());
+                            descriptionText.setText(weather_description);
+                            temperatureText.setText("Temperature: "+weather_temp);
+                            humidityText.setText("Humidity: "+weather_humid);
+                            pressureText.setText("Pressure: "+weather_pressure);
+                        }
+                    });
+                    asyncTask.execute(lattitude,longitude);
                 }
 
 
@@ -117,15 +158,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(latti,longi,1);
                 if(addresses != null && addresses.size() > 0){
-                    Address ADDRESS = addresses.get(0);
-                    String result = ADDRESS.getAddressLine(0) + ", " + ADDRESS.getLocality();
-                    textView.setText("Your current location is"+ " " + result);
+                    final Address ADDRESS = addresses.get(0);
+                    String result = ADDRESS.getLocality() + ", " + ADDRESS.getAdminArea() +", "+ADDRESS.getCountryName();
+                    locationText.setText("Your current location is"+ ":\n " + result);
+
+                    Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+                        @Override
+                        public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                            cityText.setText("City: "+ADDRESS.getAdminArea());
+                            descriptionText.setText(weather_description);
+                            temperatureText.setText("Temperature: "+weather_temp);
+                            humidityText.setText("Humidity: "+weather_humid);
+                            pressureText.setText("Pressure: "+weather_pressure);
+                        }
+                    });
+                    asyncTask.execute(lattitude,longitude);
                 }
+
+
 
 
             }else{
 
-                Toast.makeText(this,"Unble to Trace your location",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Unable to Trace your location",Toast.LENGTH_SHORT).show();
 
             }
         }
