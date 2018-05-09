@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -17,10 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -29,10 +29,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int REQUEST_LOCATION = 1;
     Button button;
-    TextView locationText, today, temp_text, humid_text, press_text, desc_text;
-    ImageView weatherIcon;
+    EditText locationText;
+    TextView temp_text, humid_text, press_text, desc_text,textNoti;
+    ImageView weatherIcon,today;
     LocationManager locationManager;
     String lattitude,longitude;
+    String url_icon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         humid_text   = findViewById(R.id.humid_text);
         press_text   = findViewById(R.id.press_text);
         weatherIcon  = findViewById(R.id.weatherIcon);
+        textNoti     = findViewById(R.id.textNoti);
         button.setOnClickListener(this);
 
     }
@@ -62,12 +66,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             try {
+
                 getLocation();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //textView.setPadding(30,30,30,30);
-
         }
     }
 
@@ -93,24 +97,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(latti,longi,1);
-                if(addresses != null && addresses.size() > 0){
+                if(addresses != null && addresses.size() > 0) {
                     final Address ADDRESS = addresses.get(0);
-                    String result = ADDRESS.getLocality() + ", " + ADDRESS.getAdminArea() +", "+ADDRESS.getCountryName();
-                    locationText.setText("Your current location is"+ ":\n " + result);
+                    String result =  ADDRESS.getAdminArea() + ", " + ADDRESS.getCountryName();
 
 
-                    Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
-                        @Override
-                        public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
-                            desc_text.setText(weather_description);
-                            temp_text.setText("Temperature: "+weather_temp);
-                            humid_text.setText("Humidity: "+weather_humid);
-                            press_text.setText("Pressure: "+weather_pressure);
-                            today.setText(WeatherIconText);
+                    if (locationText.getText().toString().equals("")||locationText.getText().toString().equals(result)) {
 
-                        }
-                    });
-                    asyncTask.execute(lattitude,longitude);
+                        locationText.setText(result);
+
+                        Function.placeIdTask asyncTask = null;
+                        asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+                            @Override
+                            public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                                textNoti.setText("");
+                                desc_text.setText(weather_description);
+                                temp_text.setText("Temperature: " + weather_temp);
+                                humid_text.setText("Humidity: " + weather_humid);
+                                press_text.setText("Pressure: " + weather_pressure);
+                                url_icon = "http://openweathermap.org/img/w/" + WeatherIconText;
+                                Picasso.get().load(url_icon).into(today);
+
+                            }
+                        });
+
+                        asyncTask.execute(lattitude, longitude);
+                    }else{
+
+                        List<Address> geoResults = geocoder.getFromLocationName(locationText.getText().toString(),1);
+                        if(geoResults.size()>0) {
+                            Address addr = geoResults.get(0);
+
+                            Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+
+                                @Override
+                                public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                                    textNoti.setText("");
+                                    desc_text.setText(weather_description);
+                                    temp_text.setText("Temperature: " + weather_temp);
+                                    humid_text.setText("Humidity " + weather_humid);
+                                    press_text.setText("Pressure: " + weather_pressure);
+                                    url_icon = "http://openweathermap.org/img/w/" + WeatherIconText;
+                                    Picasso.get().load(url_icon).into(today);
+                                }
+                            });
+                            asyncTask.execute(String.valueOf(addr.getLatitude()),String.valueOf(addr.getLongitude()));
+                        }else textNoti.setText("Invalid city/province");
+                    }
                 }
 
 
@@ -121,24 +154,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 longitude = String.valueOf(longi);
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(latti,longi,1);
-                if(addresses != null && addresses.size() > 0){
+                if(addresses != null && addresses.size() > 0) {
                     final Address ADDRESS = addresses.get(0);
-                    String result = ADDRESS.getLocality() + ", " + ADDRESS.getAdminArea() +", "+ADDRESS.getCountryName();
-                    locationText.setText("Your current location is"+ ":\n " + result);
+                    String result =  ADDRESS.getAdminArea() + ", " + ADDRESS.getCountryName();
 
-                    Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
-                        @Override
-                        public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
-                            desc_text.setText(weather_description);
-                            temp_text.setText("Temperature: "+weather_temp);
-                            humid_text.setText("Humidity: "+weather_humid);
-                            press_text.setText("Pressure: "+weather_pressure);
-                            today.setText(WeatherIconText);
+                    if (locationText.getText().toString().equals("")||locationText.getText().toString().equals(result)) {
+                        locationText.setText( result);
 
-                        }
-                    });
+                        Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+                            @Override
+                            public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                                textNoti.setText("");
+                                desc_text.setText(weather_description);
+                                temp_text.setText("Temperature: " + weather_temp);
+                                humid_text.setText("Humidity: " + weather_humid);
+                                press_text.setText("Pressure: " + weather_pressure);
+                                url_icon = "http://openweathermap.org/img/w/" + WeatherIconText;
+                                Picasso.get().load(url_icon).into(today);
 
-                    asyncTask.execute(lattitude,longitude);
+
+                            }
+                        });
+
+
+                        asyncTask.execute(lattitude, longitude);
+                    }else{
+
+                        List<Address> geoResults = geocoder.getFromLocationName(locationText.getText().toString(),1);
+                        if(geoResults.size()>0) {
+                            Address addr = geoResults.get(0);
+
+                            Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+
+                                @Override
+                                public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                                    textNoti.setText("");
+                                    desc_text.setText(weather_description);
+                                    temp_text.setText("Temperature: " + weather_temp);
+                                    humid_text.setText("Humidity " + weather_humid);
+                                    press_text.setText("Pressure: " + weather_pressure);
+                                    url_icon = "http://openweathermap.org/img/w/" + WeatherIconText;
+                                    Picasso.get().load(url_icon).into(today);
+                                }
+                            });
+                            asyncTask.execute(String.valueOf(addr.getLatitude()),String.valueOf(addr.getLongitude()));
+                        }else textNoti.setText("Invalid city/province");
+                    }
                 }
 
 
@@ -151,26 +212,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(latti,longi,1);
-                if(addresses != null && addresses.size() > 0){
+                if(addresses != null && addresses.size() > 0) {
                     final Address ADDRESS = addresses.get(0);
-                    String result = ADDRESS.getLocality() + ", " + ADDRESS.getAdminArea() +", "+ADDRESS.getCountryName();
-                    locationText.setText("Your current location is"+ ":\n " + result);
+                    String result =  ADDRESS.getAdminArea() + ", " + ADDRESS.getCountryName();
+                    if (locationText.getText().toString().equals("")||locationText.getText().toString().equals(result)) {
+                        locationText.setText( result);
 
-                    Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
-                        @Override
-                        public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
-                            desc_text.setText(weather_description);
-                            temp_text.setText("Temperature: "+weather_temp);
-                            humid_text.setText("Humidity: "+weather_humid);
-                            press_text.setText("Pressure: "+weather_pressure);
-                            today.setText(WeatherIconText);
+                        Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+                            @Override
+                            public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                                textNoti.setText("");
+                                desc_text.setText(weather_description);
+                                temp_text.setText("Temperature: " + weather_temp);
+                                humid_text.setText("Humidity: " + weather_humid);
+                                press_text.setText("Pressure: " + weather_pressure);
+                                url_icon = "http://openweathermap.org/img/w/" + WeatherIconText;
+                                Picasso.get().load(url_icon).into(today);
 
 
+                            }
+                        });
+                        asyncTask.execute(lattitude, longitude);
+                    }else{
 
+                        List<Address> geoResults = geocoder.getFromLocationName(locationText.getText().toString(),1);
+                        if(geoResults.size()>0) {
+                            Address addr = geoResults.get(0);
 
-                        }
-                    });
-                    asyncTask.execute(lattitude,longitude);
+                            Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+
+                                @Override
+                                public void processFinish(String weather_city, String weather_description, String weather_temp, String weather_humid, String weather_pressure, String weatherUpdateOn, String WeatherIconText, String sun_rise) {
+                                    textNoti.setText("");
+                                    desc_text.setText(weather_description);
+                                    temp_text.setText("Temperature: " + weather_temp);
+                                    humid_text.setText("Humidity " + weather_humid);
+                                    press_text.setText("Pressure: " + weather_pressure);
+                                    url_icon = "http://openweathermap.org/img/w/" + WeatherIconText;
+                                    Picasso.get().load(url_icon).into(today);
+                                }
+                            });
+                            asyncTask.execute(String.valueOf(addr.getLatitude()),String.valueOf(addr.getLongitude()));
+                        }else textNoti.setText("Invalid city/province");
+                    }
                 }
 
 
@@ -202,5 +286,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
+
+
+
+
 
 }
