@@ -18,7 +18,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Function {
+public class OpenWeatherMap {
 
     private static final String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
     private static final String OPEN_WEATHER_MAP_API = "0fe040a749d54aa61b244632a042b96d";
@@ -42,7 +42,7 @@ public class Function {
                 jsonWeather = getWeatherJSON(params[0], params[1]);
 
             } catch (Exception e) {
-                Log.d("Error", "Cannot process JSON results", e);
+                Log.d("Error", "Cannot process JSON results.", e);
             }
 
             return jsonWeather;
