@@ -1,4 +1,4 @@
-package com.example.huyhoang8398.se;
+package com.example.Big4.se;
 
 import android.content.Context;
 import android.location.Criteria;
