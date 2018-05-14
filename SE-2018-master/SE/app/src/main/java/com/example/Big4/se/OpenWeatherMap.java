@@ -25,7 +25,8 @@ public class OpenWeatherMap {
     private static String OPEN_WEATHER_MAP_ICON = "http://openweathermap.org/img/w/";
 
     public interface AsyncResponse {
-        void processFinish(String output1, String output2, String output3, String output4, String output5, String output6, String output7, String output8);
+        void processFinish(String output1, String output2, String output3,
+            String output4, String output5, String output6, String output7, String output8);
     }
 
     public static class placeIdTask extends AsyncTask<String, Void, JSONObject> {
@@ -57,8 +58,8 @@ public class OpenWeatherMap {
                     JSONObject main = json.getJSONObject("main");
                     DateFormat df = DateFormat.getDateTimeInstance();
 
-
-                    String city = json.getString("name").toUpperCase(Locale.US) + ", " + json.getJSONObject("sys").getString("country");
+                    String city = json.getString("name").toUpperCase(Locale.US) + ", " 
+                        + json.getJSONObject("sys").getString("country");
                     String description = details.getString("description").toUpperCase(Locale.US);
                     String temperature = String.format("%.2f", main.getDouble("temp")) + "°C";
                     String humidity = main.getString("humidity") + "%";
@@ -66,15 +67,14 @@ public class OpenWeatherMap {
                     String updatedOn = df.format(new Date(json.getLong("dt") * 1000));
                     String iconText = details.getString("icon") + ".png";
                     OPEN_WEATHER_MAP_ICON = OPEN_WEATHER_MAP_ICON + iconText;
-                    delegate.processFinish(city, description, temperature, humidity, pressure, updatedOn, iconText, "" + (json.getJSONObject("sys").getLong("sunrise") * 1000));
-
+                    delegate.processFinish(city, description, temperature, humidity, pressure, updatedOn, iconText, ""
+                     + (json.getJSONObject("sys").getLong("sunrise") * 1000));
                 }
             } catch (JSONException e) {
                 //Log.e(LOG_TAG, "Cannot process JSON results", e);
             }
         }
     }
-
 
     public static JSONObject getWeatherJSON(String lat, String lon) {
         try {
@@ -100,7 +100,6 @@ public class OpenWeatherMap {
             if (data.getInt("cod") != 200) {
                 return null;
             }
-
             return data;
         } catch (Exception e) {
             return null;

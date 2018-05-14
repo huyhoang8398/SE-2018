@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             {
                 Location location_network = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 Location location_gps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                Location location_passive = locationManager.getLastKnownLocation(LocationManager. PASSIVE_PROVIDER);
+                Location location_passive = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                 /* 3 options above are used as sources to get location information: from cellular data, GPS or WIFI */
                 if (location_network != null || location_gps != null || location_passive != null ) {
                     double lat=0,lon=0;
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 asyncTask.execute(String.valueOf(addr.getLatitude()),String.valueOf(addr.getLongitude()));
                             }else
                                 {
-                                    noti_text.setText("Invalid city/province");
+                                    noti_text.setText("Invalid city/province.");
                                     desc_text.setText("");
                                     temp_text.setText("");
                                     humid_text.setText("");
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                 }
 
-            }else Toast.makeText(this,"Unable to Trace your location",Toast.LENGTH_SHORT).show();
+            }else Toast.makeText(this,"Unable to trace your location.",Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -181,12 +181,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Please Turn ON your GPS Connection.")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Yes.", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton("No.", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
                     }
